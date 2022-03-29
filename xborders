@@ -13,6 +13,7 @@ import draw
 import subprocess
 
 DESKTOP_DRAG_STRESS_TOY = True;
+I3_BORDER = 0;
 BORDER_RADIUS = 14;
 BORDER_WIDTH = 4.0;
 BORDER_R = 100;
@@ -105,8 +106,8 @@ class Highlight (Gtk.Window):
 		position, size = get_win();
 		if (position != None):
 			draw.draw_rectangle(
-				ctx, position.x, position.y,
-				size.width, size.height,
+				ctx, position.x - (BORDER_WIDTH/2) - I3_BORDER, position.y - (BORDER_WIDTH/2) - I3_BORDER,
+				size.width + BORDER_WIDTH, size.height + BORDER_WIDTH,
 				BORDER_RADIUS, BORDER_WIDTH,
 				[0, 0, 0, 0],
 				[BORDER_R, BORDER_G, BORDER_B, BORDER_A]);

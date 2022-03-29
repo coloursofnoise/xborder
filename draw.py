@@ -1,10 +1,10 @@
 import math
-import typing
+import typing as t
 
 def draw_rectangle(ctx, x: int, y: int,
 										width: int, height: int,
 										border_radius:int, border_size: int,
-										color:list[int], border_color:list[int]|None) -> None:
+										color: t.List[int], border_color:t.Optional[t.List[int]]) -> None:
 	ctx.set_source_rgba(color[0] / 255, color[1] / 255, color[2] / 255, color[3]);
 	if (border_radius > 0):
 		corner_radius = border_radius
