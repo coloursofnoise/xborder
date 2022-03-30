@@ -37,14 +37,15 @@ def get_win_xdo():
 	else:
 		return None, None;
 
-def i3_get_rect(win):
+def i3_get_data(win):
 	win_rect, offset = win.window_rect, win.rect
 	return {
 		"x": win_rect.x + offset.x,
 		"y": win_rect.y + offset.y,
-		"width": win_rect.width,
-		"height": win_rect.height,
+		"width": win_rect.width or offset.width,
+		"height": win_rect.height or offset.height,
 		"fullscreen": win.fullscreen_mode > 0,
+		"window": win.window
 	}
 
 
@@ -58,8 +59,9 @@ def init_i3():
 		i3_con = i3ipc.Connection()
 		def window_event_handler(con, e):
 			win = con.get_tree().find_focused()
-			q.put(i3_get_rect(win))
+			q.put(i3_get_data(win))
 		i3_con.on(i3ipc.Event.WINDOW, window_event_handler)
+		i3_con.on(i3ipc.Event.WORKSPACE_FOCUS, window_event_handler)
 		window_event_handler(i3_con, None)
 		i3_con.main()
 
@@ -73,9 +75,14 @@ def get_win_i3():
 	try:
 		win = i3_win_queue.get(block=False)
 		i3_win_cached = win
+		if not win["window"]: #no window in workspace
+			global rectangle
+			rectangle = cairo.RectangleInt(win["x"], win["y"], win["width"], win["height"])
+			win = i3_win_cached = None
 	except queue.Empty:
 		win = i3_win_cached
 	except:
+		raise
 		return None, None
 	if (win):
 		win_rect = i3ipc.Rect(win)
