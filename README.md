@@ -17,12 +17,12 @@ sudo apt install python3-gi
 
 With [`pipx`](https://pypa.github.io/pipx/):
 ```sh
-pipx install git+https://github.com/coloursofnoise/xborder --system-site packages
+pipx install git+https://github.com/coloursofnoise/xborder --system-site-packages
 ```
 
 With support for a window manager:
 ```sh
-pipx install git+https://github.com/coloursofnoise/xborder[{window_manager}] --system-site-packages
+pipx install "xborder[{window_manager}] @ git+https://github.com/coloursofnoise/xborder" --system-site-packages
 ```
 
 Replace `{window_manager}` with any of the following supported window managers:
