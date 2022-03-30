@@ -33,7 +33,7 @@ def get_win_xdo():
 	if (win):
 		size = xdo.get_window_size(win)
 		position = xdo.get_window_location(win)
-		return position, size;
+		return position, size, True;
 	else:
 		return None, None;
 
@@ -44,6 +44,7 @@ def i3_get_rect(win):
 		"y": win_rect.y + offset.y,
 		"width": win_rect.width,
 		"height": win_rect.height,
+		"fullscreen": win.fullscreen_mode > 0,
 	}
 
 
@@ -58,9 +59,8 @@ def init_i3():
 		def window_event_handler(con, e):
 			win = con.get_tree().find_focused()
 			q.put(i3_get_rect(win))
-		i3_con.on(i3ipc.Event.WINDOW_FOCUS, window_event_handler)
-		i3_con.on(i3ipc.Event.WINDOW_CLOSE, window_event_handler)
-		q.put(i3_get_rect(i3_con.get_tree().find_focused()))
+		i3_con.on(i3ipc.Event.WINDOW, window_event_handler)
+		window_event_handler(i3_con, None)
 		i3_con.main()
 
 	Process(target=run_proc, args=(i3_win_queue,)).start()
@@ -79,7 +79,7 @@ def get_win_i3():
 		return None, None
 	if (win):
 		win_rect = i3ipc.Rect(win)
-		return win_rect, win_rect
+		return win_rect, win_rect, not win["fullscreen"]
 	else:
 		return None, None;
 
@@ -187,14 +187,16 @@ class Highlight (Gtk.Window):
 				exit(1)
 		ctx.save()
 
-		position, size = get_win();
+		position, size, *draw = get_win();
+		draw = draw[0] if len(draw) > 0 else None
 		if (position != None):
-			draw_border(
-				ctx, position.x - (BORDER_WIDTH/2), position.y - (BORDER_WIDTH/2),
-				size.width + BORDER_WIDTH, size.height + BORDER_WIDTH,
-				BORDER_RADIUS, BORDER_WIDTH,
-				[0, 0, 0, 0],
-				[BORDER_R, BORDER_G, BORDER_B, BORDER_A]);
+			if draw:
+				draw_border(
+					ctx, position.x - (BORDER_WIDTH/2), position.y - (BORDER_WIDTH/2),
+					size.width + BORDER_WIDTH, size.height + BORDER_WIDTH,
+					BORDER_RADIUS, BORDER_WIDTH,
+					[0, 0, 0, 0],
+					[BORDER_R, BORDER_G, BORDER_B, BORDER_A]);
 
 			self.set_accept_focus(False)
 			self.set_focus_on_map(False)
