@@ -9,10 +9,30 @@ Active window border replacement for window managers.
 ## Fun desktop stress toy
 ![fun](https://user-images.githubusercontent.com/82973108/160370871-31f4dd1a-c508-4a82-a980-4724186ee8f0.gif)
 
-## Dependencies
-* pycairo (Tested with version 1.21.0, `pip install pycairo`)
-* python-libxdo (Tested with version 0.1.2a1, `pip install python-libxdo`)
-* gtk
+## Install
+Install `python3-gi` dependency:
+```
+sudo apt install python3-gi
+```
+
+With [`pipx`](https://pypa.github.io/pipx/):
+```sh
+pipx install git+https://github.com/coloursofnoise/xborder --system-site packages
+```
+
+With support for a window manager:
+```sh
+pipx install git+https://github.com/coloursofnoise/xborder[{window_manager}] --system-site-packages
+```
+
+Replace `{window_manager}` with any of the following supported window managers:
+* i3
+<!--* all (equivalent of [i3,...])-->
+
+## Usage
+```sh
+xborder [wm]
+```
 
 ### Config
 Config is on like 17-23 of the xborder file. 
