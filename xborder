@@ -1,4 +1,5 @@
 #!/bin/python3
+import argparse
 import sys
 import cairo
 
@@ -19,10 +20,20 @@ import queue
 DESKTOP_DRAG_STRESS_TOY = True;
 BORDER_RADIUS = 14;
 BORDER_WIDTH = 4.0;
-BORDER_R = 100;
-BORDER_G = 78;
-BORDER_B = 248;
-BORDER_A = 1;
+BORDER_COLOR = [100,78,248,1]
+
+def set_color(color_in):
+	global BORDER_COLOR
+	alpha = 1
+	color_in = color_in.lstrip("#")
+	if len(color_in) == 6:
+		color = [int(color_in[i:i+2], 16) for i in (0, 2, 4)]
+	elif len(color_in) == 8:
+		color = [int(color_in[i:i+2], 16) for i in (0, 2, 4)]
+		alpha = int(color_in[6:8], 16) / 255
+	else:
+		raise Exception("Bad color value!")
+	BORDER_COLOR = color + [alpha]
 
 def get_win_xdo():
 	win = None
@@ -203,7 +214,7 @@ class Highlight (Gtk.Window):
 					size.width + BORDER_WIDTH, size.height + BORDER_WIDTH,
 					BORDER_RADIUS, BORDER_WIDTH,
 					[0, 0, 0, 0],
-					[BORDER_R, BORDER_G, BORDER_B, BORDER_A]);
+					BORDER_COLOR);
 
 			self.set_accept_focus(False)
 			self.set_focus_on_map(False)
@@ -222,8 +233,8 @@ class Highlight (Gtk.Window):
 					ctx, self.rect_x, self.rect_y,
 					current.x - self.rect_x, current.y - self.rect_y,
 					0, 4,
-					[BORDER_R, BORDER_G, BORDER_B, 0.5],
-					[BORDER_R, BORDER_G, BORDER_B, 0.85]
+					BORDER_COLOR[:3] + [BORDER_COLOR[3] * 0.5],
+					BORDER_COLOR[:3] + [BORDER_COLOR[3] * 0.85]
 				)
 		
 		ctx.restore()
@@ -241,9 +252,16 @@ def main():
 
 if __name__=="__main__":
 	try:
+		parser = argparse.ArgumentParser()
+		parser.add_argument("wm", action="store", nargs="?", default="")
+		parser.add_argument("--color", action="store", default="#644ef8")
+		args = parser.parse_args()
+
+		set_color(args.color)
+
 		global get_win
 		get_win = get_win_xdo
-		if len(sys.argv) > 1 and sys.argv[1] == "i3":
+		if args.wm == "i3":
 			import i3ipc
 			print("i3-specific support enabled")
 			init_i3()
